@@ -50,10 +50,12 @@ def autolikecomment():
 			tagsCount = 0
 			likesCount = 0
 			random.shuffle(tags)
+			f1 = open('dump.txt', 'a')
 			for val in tags:			
 				browser.get("https://www.instagram.com/explore/tags/%s/?hl=en" %val) 
 				time.sleep(2)
 				#click first image
+				f1.write('\n'+ val)
 				browser.find_element_by_xpath("//*[@class='_mck9w _gvoze _tn0ps']").click()
 				#browser.div(:class => '').click
 				reps = 0
@@ -61,6 +63,7 @@ def autolikecomment():
 				for i in repeat(0,150):		
 					print (i)
 					reps += reps
+					f1.write('\n'+reps)
 					try:
 						nxtArrow = browser.find_element_by_xpath("//*[@class='_3a693 coreSpriteRightPaginationArrow']")	
 						if reps % 6 == 0:
@@ -85,14 +88,16 @@ def autolikecomment():
 			    			time.sleep(5)
 					except NoSuchElementException:
 						break	
-				tagsCount += tagsCount	
+				tagsCount += tagsCount
+				f1.write('\n'+ 'TagsCount: '+ tagsCount)	
 				time.sleep(10)
 
 			browser.quit()
+			f1.close()
 			return jsonify({"success": True, "likeCount": likesCount, "tagsCount": tagsCount})
 		finally:
-			browser.close()
-			
+			return jsonify({"success": False})
+
 
 if __name__ == "__main__":
 	app.run()
