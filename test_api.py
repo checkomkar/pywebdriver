@@ -7,7 +7,7 @@ import time
 from flask import Flask
 from flask import jsonify
 from flask import request
-
+from pyvirtualdisplay import Display
 
 
 time.sleep(3)
@@ -33,62 +33,66 @@ app = Flask(__name__)
 @app.route("/autolikecomment", methods=['GET', 'POST'])
 def autolikecomment():
 	if request.method == 'GET':
-		options = webdriver.ChromeOptions()
-		# options.add_argument('headless')
-		browser = webdriver.Chrome(chrome_options=options)
-		browser.get('https://www.instagram.com/accounts/login/')
-		#assert 'Yahoo!' in browser.title
-		time.sleep(3)
-		username = browser.find_element_by_name('username')  # Find the search box
-		username.send_keys('stra.tus')
-		password = browser.find_element_by_name('password')
-		password.send_keys('enter_sandy3K' + Keys.ENTER)
-		time.sleep(5)
-		tagsCount = 0
-		likesCount = 0
-		random.shuffle(tags)
-		for val in tags:			
-			browser.get("https://www.instagram.com/explore/tags/%s/?hl=en" %val) 
-			time.sleep(2)
-			#click first image
-			browser.find_element_by_xpath("//*[@class='_mck9w _gvoze _tn0ps']").click()
-			#browser.div(:class => '').click
-			reps = 0
+		try:		
+			display = Display(visible=0, size=(800, 600))
+			display.start()
+			options = webdriver.ChromeOptions()
+			# options.add_argument('headless')
+			browser = webdriver.Chrome(chrome_options=options)
+			browser.get('https://www.instagram.com/accounts/login/')
+			#assert 'Yahoo!' in browser.title
 			time.sleep(3)
-			for i in repeat(0,150):		
-				print (i)
-				reps += reps
-				try:
-					nxtArrow = browser.find_element_by_xpath("//*[@class='_3a693 coreSpriteRightPaginationArrow']")	
-					if reps % 6 == 0:
-						print('In mod')
-						try:		
-							element = browser.find_element_by_xpath("//*[@class='_8scx2 coreSpriteHeartOpen']")
-							if element is not None:
-								browser.find_element_by_class_name('_bilrf').clear()
-								browser.find_element_by_class_name('_bilrf').send_keys(random.choice(comments) + Keys.ENTER)
-								time.sleep(2)
+			username = browser.find_element_by_name('username')  # Find the search box
+			username.send_keys('stra.tus')
+			password = browser.find_element_by_name('password')
+			password.send_keys('enter_sandy3K' + Keys.ENTER)
+			time.sleep(5)
+			tagsCount = 0
+			likesCount = 0
+			random.shuffle(tags)
+			for val in tags:			
+				browser.get("https://www.instagram.com/explore/tags/%s/?hl=en" %val) 
+				time.sleep(2)
+				#click first image
+				browser.find_element_by_xpath("//*[@class='_mck9w _gvoze _tn0ps']").click()
+				#browser.div(:class => '').click
+				reps = 0
+				time.sleep(3)
+				for i in repeat(0,150):		
+					print (i)
+					reps += reps
+					try:
+						nxtArrow = browser.find_element_by_xpath("//*[@class='_3a693 coreSpriteRightPaginationArrow']")	
+						if reps % 6 == 0:
+							print('In mod')
+							try:		
+								element = browser.find_element_by_xpath("//*[@class='_8scx2 coreSpriteHeartOpen']")
+								if element is not None:
+									browser.find_element_by_class_name('_bilrf').clear()
+									browser.find_element_by_class_name('_bilrf').send_keys(random.choice(comments) + Keys.ENTER)
+									time.sleep(2)
+							except NoSuchElementException:
+								nxtArrow.click()
+								time.sleep(5)
+						
+						try:			    
+							likeelement = browser.find_element_by_xpath("//*[@class='_8scx2 coreSpriteHeartOpen']")
+							likeelement.click()
+							likesCount += likesCount			
+							time.sleep(5)
 						except NoSuchElementException:
 							nxtArrow.click()
-							time.sleep(5)
-					
-					try:			    
-						likeelement = browser.find_element_by_xpath("//*[@class='_8scx2 coreSpriteHeartOpen']")
-						likeelement.click()
-						likesCount += likesCount			
-						time.sleep(5)
+			    			time.sleep(5)
 					except NoSuchElementException:
-						nxtArrow.click()
-		    			time.sleep(5)
-				except NoSuchElementException:
-					break	
-			tagsCount += tagsCount	
-			time.sleep(10)
+						break	
+				tagsCount += tagsCount	
+				time.sleep(10)
 
-		browser.quit()
-		return jsonify({"success": True, "likeCount": likesCount, "tagsCount": tagsCount})
-    
-
+			browser.quit()
+			return jsonify({"success": True, "likeCount": likesCount, "tagsCount": tagsCount})
+		finally:
+			browser.close()
+			
 
 if __name__ == "__main__":
 	app.run()
